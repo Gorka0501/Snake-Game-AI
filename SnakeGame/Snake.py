@@ -1,4 +1,3 @@
-import pygame as pg
 import numpy as np
 
 from SnakeGame.Movements import Movements

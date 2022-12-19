@@ -1,3 +1,3 @@
 from SnakeGame import *
 
-Game(3, 3, 4).loop()
+Game(10, 10, 2).loop()

@@ -1,7 +1,5 @@
 import numpy as np
 
-from SnakeGame.Snake import Snake
-
 
 class Fruit:
     __x_pos: int = 0
