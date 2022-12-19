@@ -94,8 +94,8 @@ class Snake:
     def __init__(
         self, table_width: int, table_height: int, body_length: int = 0
     ) -> None:
-        head_x = np.random.choice(range(table_width - 1))
-        head_y = np.random.choice(range(table_height - 1))
+        head_x = np.random.choice(range(table_width))
+        head_y = np.random.choice(range(table_height))
         self.__head = Head(head_x, head_y)
         self.__bodies = []
         self.__direction = Movements.STOP

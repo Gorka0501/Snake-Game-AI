@@ -22,7 +22,7 @@ class SnakeTable:
     def __init__(self, x: int, y: int) -> None:
         self.__x_squares = x
         self.__y_squares = y
-        self.__matrix = np.zeros(shape=(x, y), dtype=np.int8)
+        self.__matrix = np.zeros(shape=(y, x), dtype=np.int8)
         self.__snake = Snake(self.__x_squares, self.__y_squares)
         self.__fruits.append(
             Fruit(self.__x_squares, self.__y_squares, self.get_occupied())
@@ -48,7 +48,7 @@ class SnakeTable:
 
     def update_matrix(self) -> None:
         self.__matrix = np.zeros(
-            shape=(self.__x_squares, self.__y_squares), dtype=np.int8
+            shape=(self.__y_squares, self.__x_squares), dtype=np.int8
         )
 
         snake_head_x_pos, snake_head_y_pos = self.__snake.get_head().get_pos()

@@ -64,11 +64,11 @@ class Game:
                 new_direction = Movements.WEST
             if keys[pg.K_a]:
                 new_direction = Movements.EAST
-            if velocity == 0:
+            if velocity <= 0:
                 self.__table.get_snake().change_direction(new_direction)
                 end, why = self.__table.update()
-                velocity = self.__frame_rate / self.__vel
                 self.update_info(end, why)
+                velocity = self.__frame_rate / self.__vel
             velocity -= 1
             game_screen.draw(
                 self.__table.get_snake(), self.__table.get_fruits(), self.__data
@@ -78,8 +78,11 @@ class Game:
                 match why:
                     case 1:
                         print(f"YOU WIN")
+                        print(self.__data)
                     case 0:
                         print(f"YOU LOSE. \n You crashed against a wall")
+                        print(self.__data)
                     case 2:
                         print(f"YOU LOSE. \n You ate your own tail")
+                        print(self.__data)
                 pg.quit()

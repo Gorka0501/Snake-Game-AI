@@ -14,11 +14,11 @@ class Fruit:
     def set_position(
         self, table_width: int, table_height: int, occupied: list[tuple[int, int]]
     ) -> None:
-        x_pos = np.random.choice(range(table_height))
-        y_pos = np.random.choice(range(table_width))
+        x_pos = np.random.choice(range(table_width))
+        y_pos = np.random.choice(range(table_height))
         while (x_pos, y_pos) in occupied:
-            x_pos = np.random.choice(range(table_height))
-            y_pos = np.random.choice(range(table_width))
+            x_pos = np.random.choice(range(table_width))
+            y_pos = np.random.choice(range(table_height))
         self.__x_pos = x_pos
         self.__y_pos = y_pos
         self.__is_eaten = False
