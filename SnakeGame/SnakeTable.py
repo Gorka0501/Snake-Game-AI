@@ -1,3 +1,4 @@
+from dataclasses import field
 import numpy as np
 from SnakeGame.Fruit import Fruit
 from SnakeGame.Snake import Snake
@@ -16,18 +17,16 @@ class SnakeTable:
     __x_squares: int = 0
     __y_squares: int = 0
     __snake: Snake
-    __matrix: np.ndarray
-    __fruits: list[Fruit] = []
+    __fruits: list[Fruit]
 
     def __init__(self, x: int, y: int) -> None:
         self.__x_squares = x
         self.__y_squares = y
-        self.__matrix = np.zeros(shape=(y, x), dtype=np.int8)
         self.__snake = Snake(self.__x_squares, self.__y_squares)
+        self.__fruits = []
         self.__fruits.append(
             Fruit(self.__x_squares, self.__y_squares, self.get_occupied())
         )
-        self.update_matrix()
 
     def get_occupied(self) -> list[tuple[int, int]]:
         occupied = []
@@ -37,35 +36,11 @@ class SnakeTable:
                 occupied.append(fruit.get_pos())
         return occupied
 
-    def get_matrix(self) -> np.ndarray:
-        return self.__matrix
-
     def get_snake(self) -> Snake:
         return self.__snake
 
     def get_fruits(self) -> list[Fruit]:
         return self.__fruits
-
-    def update_matrix(self) -> None:
-        self.__matrix = np.zeros(
-            shape=(self.__y_squares, self.__x_squares), dtype=np.int8
-        )
-
-        snake_head_x_pos, snake_head_y_pos = self.__snake.get_head().get_pos()
-        if not self.__matrix[snake_head_y_pos][snake_head_x_pos] == 2:
-            self.__matrix[snake_head_y_pos][snake_head_x_pos] = 1
-
-        for body_number, body in enumerate(self.__snake.get_bodies()):
-            body_x_pos, body_y_pos = body.get_pos()
-            if not (
-                body_number == len(self.__snake.get_bodies()) - 1
-                and self.__matrix[body_y_pos][body_x_pos] == 1
-            ):
-                self.__matrix[body_y_pos][body_x_pos] = 2
-
-        for fruit in self.__fruits:
-            fruit_x_pos, fruit_y_pos = fruit.get_pos()
-            self.__matrix[fruit_y_pos][fruit_x_pos] = 3
 
     def snake_out_of_bounds(self, head_pos: tuple[int, int]) -> bool:
 
@@ -106,13 +81,10 @@ class SnakeTable:
             return True, 0
 
         if self.ate_tail(head_pos):
-            self.update_matrix()
             return True, 2
 
         if self.absolute_win():
-            self.update_matrix()
             return True, 1
-
         for fruit_idx, fruit in enumerate(self.__fruits):
             if fruit.get_pos() == head_pos:
                 self.__snake.increase(head_pos)
@@ -122,8 +94,6 @@ class SnakeTable:
                     Fruit(self.__x_squares, self.__y_squares, self.get_occupied())
                 )
 
-                self.update_matrix()
                 return False, 1
 
-        self.update_matrix()
         return False, 0

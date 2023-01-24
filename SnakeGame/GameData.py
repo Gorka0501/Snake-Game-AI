@@ -9,4 +9,4 @@ class GameData:
     turns: int = 0
     eaten_fruits: int = 0
     turns_without_eat: int = 0
-    vel: int = 0
+    vel: float = 0

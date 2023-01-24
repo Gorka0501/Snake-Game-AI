@@ -8,81 +8,92 @@ from SnakeGame.GameData import GameData
 
 
 class Game:
-    __x_squares: int
-    __y_squares: int
-    __vel: int
-    __table: SnakeTable
-    __frame_rate: int = 60
-    __data: GameData = GameData()
+    x_squares: int
+    y_squares: int
+    vel: int
+    table: SnakeTable
+    frame_rate: int = 60
+    data: GameData = GameData()
 
-    def __init__(self, x: int, y: int, inic_vel: int) -> None:
-        self.__x_squares = x
-        self.__y_squares = y
-        self.__vel = inic_vel
-        self.__data.vel = inic_vel
-        self.__table = SnakeTable(self.__x_squares, self.__y_squares)
+    def __init__(self, x: int, y: int, inic_vel: int, frame_rate: int = 60) -> None:
+        self.frame_rate = frame_rate
+        self.x_squares = x
+        self.y_squares = y
+        self.vel = min(frame_rate, inic_vel)
+        self.data = GameData()
+        self.data.vel = inic_vel
+        self.table = SnakeTable(self.x_squares, self.y_squares)
 
     def update_info(self, end: bool, eat: int) -> GameData:
         if eat == 1:
-            self.__data.score += round(
-                max(50 - self.__data.turns_without_eat / 2, 25) * sqrt(self.__data.vel)
-            )
-            self.__data.eaten_fruits += 1
-            self.__data.turns_without_eat = 0
+            self.data.score += round(max(50 - self.data.turns_without_eat / 2, 0))
+            self.data.eaten_fruits += 1
+            self.data.turns_without_eat = 0
             if end:
-                self.__data.score += 1000
+                self.data.score += 1000
         else:
-            self.__data.turns_without_eat += 1
+            self.data.turns_without_eat += 1
 
-        self.__data.turns += 1
-        return self.__data
+        self.data.turns += 1
+        return self.data
 
-    def loop(self):
+    def update_loop(self, new_direction: Movements) -> tuple[bool, int]:
+        self.table.get_snake().change_direction(new_direction)
+        end, why = self.table.update()
+        self.update_info(end, why)
+        return end, why
+
+    def movements_loop(self, last_movement: Movements) -> Movements:
+
+        keys = pg.key.get_pressed()
+        new_direction = last_movement
+        if keys[pg.K_w]:
+            new_direction = Movements.NORTH
+        if keys[pg.K_s]:
+            new_direction = Movements.SOUTH
+        if keys[pg.K_d]:
+            new_direction = Movements.WEST
+        if keys[pg.K_a]:
+            new_direction = Movements.EAST
+        return new_direction
+
+    def end_game(self, why: int) -> None:
+        match why:
+            case 1:
+                print(f"YOU WIN")
+                print(self.data)
+            case 0:
+                print(f"YOU LOSE. \n You crashed against a wall")
+                print(self.data)
+            case 2:
+                print(f"YOU LOSE. \n You ate your own tail")
+                print(self.data)
+        pg.quit()
+
+    def play(self):
         pg.init()
-
         pg.mouse.set_visible(False)
-        game_screen = GameScreen(self.__x_squares, self.__y_squares)
-        clock = pg.time.Clock()
+        game_screen = GameScreen(self.x_squares, self.y_squares)
 
-        new_direction = Movements.STOP
+        clock = pg.time.Clock()
         end = False
         why = 0
-        velocity = self.__frame_rate / self.__vel
+        velocity = self.frame_rate / self.vel
+        new_direction = Movements.STOP
         while not end:
-            clock.tick(self.__frame_rate)
+            clock.tick(self.frame_rate)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
                     exit()
-
-            keys = pg.key.get_pressed()
-            if keys[pg.K_w]:
-                new_direction = Movements.NORTH
-            if keys[pg.K_s]:
-                new_direction = Movements.SOUTH
-            if keys[pg.K_d]:
-                new_direction = Movements.WEST
-            if keys[pg.K_a]:
-                new_direction = Movements.EAST
+            new_direction = self.movements_loop(new_direction)
             if velocity <= 0:
-                self.__table.get_snake().change_direction(new_direction)
-                end, why = self.__table.update()
-                self.update_info(end, why)
-                velocity = self.__frame_rate / self.__vel
+                end, why = self.update_loop(new_direction)
+                velocity = self.frame_rate / self.vel
             velocity -= 1
-            game_screen.draw(
-                self.__table.get_snake(), self.__table.get_fruits(), self.__data
-            )
+
+            game_screen.draw(self.table.get_snake(), self.table.get_fruits(), self.data)
             pg.display.update()
             if end:
-                match why:
-                    case 1:
-                        print(f"YOU WIN")
-                        print(self.__data)
-                    case 0:
-                        print(f"YOU LOSE. \n You crashed against a wall")
-                        print(self.__data)
-                    case 2:
-                        print(f"YOU LOSE. \n You ate your own tail")
-                        print(self.__data)
-                pg.quit()
+                self.end_game(why)
+                break

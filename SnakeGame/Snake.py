@@ -109,13 +109,16 @@ class Snake:
     def get_bodies(self) -> list[Body]:
         return self.__bodies
 
+    def get_direction(self) -> Movements:
+        return self.__direction
+
     def change_direction(self, mov: Movements) -> None:
         if (
             (mov == Movements.NORTH and not (self.__direction == Movements.SOUTH))
             or (mov == Movements.SOUTH and not (self.__direction == Movements.NORTH))
             or (mov == Movements.WEST and not (self.__direction == Movements.EAST))
             or (mov == Movements.EAST and not (self.__direction == Movements.WEST))
-            or (self.__length == 1)
+            or self.__length == 1
         ):
             self.__direction = mov
 
